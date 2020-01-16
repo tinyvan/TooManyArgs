@@ -1,4 +1,5 @@
 #include "Command.hpp"
+#include "Error.hpp"
 extern std::map<std::string, Command::Application> commands;
 void Command::Application::setArg(std::string arg)
 {
@@ -16,16 +17,19 @@ int Command::Application::run(std::vector<std::string> &args)
 void Command::load(std::string list)
 {
     std::fstream s_list;
-    s_list.open(list);
+    s_list.open(list, std::ios::in);
     if (s_list.fail())
-        exit(EXIT_FAILURE);
+    {
+        Error(e_confnotopen, EXIT_FAILURE);
+    }
     std::string _cmd, _name;
-    //std::istringstream _iss;
-    while (!s_list.eof())
+    while (not s_list.eof())
     {
         getline(s_list, _name, ':');
         if (s_list.peek() == '\n')
+        {
             s_list.ignore();
+        }
         getline(s_list, _cmd);
         commands[_name].setArg(_cmd);
     }
